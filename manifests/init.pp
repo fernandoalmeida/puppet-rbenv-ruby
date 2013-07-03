@@ -4,8 +4,9 @@
 #
 # === Examples
 #
-#  class { rbenv-ruby:
-#    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ]
+#  class {"rbenv-ruby":
+#    user    => "fernando",
+#    version => "2.0.0-p247"
 #  }
 #
 # === Authors
@@ -25,19 +26,19 @@ class rbenv-ruby($user, $version) {
     group   => $user,
   }->
   exec {"rbenv_path":
-    command => "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> /home/${user}/.profile && exec \$SHELL -l",
+    command => "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> /home/${user}/.profile",
     user    => $user,
     group   => $user,
     unless  => "cat /home/${user}/.profile | grep rbenv",
   }->
   exec {"rbenv_root":
-    command => "echo 'export RBENV_ROOT=\"\$HOME/.rbenv\"' >> /home/${user}/.profile && exec \$SHELL -l",
+    command => "echo 'export RBENV_ROOT=\"\$HOME/.rbenv\"' >> /home/${user}/.profile",
     user    => $user,
     group   => $user,
     unless  => "cat /home/${user}/.profile | grep RBENV_ROOT",
   }->
   exec {"rbenv_init":
-    command     => "rbenv init - >> /home/${user}/.profile && exec \$SHELL -l",
+    command     => "/home/${user}/.rbenv/bin/rbenv init - >> /home/${user}/.profile",
     user        => $user,
     group       => $user,
     unless      => "cat /home/${user}/.profile | grep 'rbenv()'",
@@ -66,7 +67,6 @@ class rbenv-ruby($user, $version) {
     creates => "/home/${user}/.rbenv/plugins/rbenv-gem-rehash",
     user        => $user,
     group       => $user,
-    require     => [ Exec["rbenv_init"] ],
   }->
   exec {"rbenv-default-gems":
     command => "git clone https://github.com/sstephenson/rbenv-default-gems.git /home/${user}/.rbenv/plugins/rbenv-default-gems",
@@ -80,20 +80,22 @@ class rbenv-ruby($user, $version) {
     group   => $user,
     mode    => "0644",
     path    => "/home/${user}/.rbenv/default-gems",
-    content => "bundler",
+    content => "
+    bundler
+    ",
   }->
   exec {"ruby-install":
-    command => "rbenv install ${version}",
+    command => "/home/${user}/.rbenv/bin/rbenv install ${version}",
     user    => $user,
     group   => $user,
     creates => "/home/${user}/.rbenv/versions/${version}",
     timeout => 0,
   }->
   exec {"ruby-global":
-    command => "rbenv global ${version}",
+    command => "/home/${user}/.rbenv/bin/rbenv global ${version}",
     user    => $user,
     group   => $user,
-    unless  => "rbenv versions | grep '* ${version}'",
+    unless  => "/home/${user}/.rbenv/bin/rbenv versions | grep '* ${version}'",
   }
   
 }
