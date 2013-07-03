@@ -26,19 +26,19 @@ class rbenv-ruby($user, $version) {
     group   => $user,
   }->
   exec {"rbenv_path":
-    command => "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> /home/${user}/.profile",
+    command => "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> /home/${user}/.profile && exec \$SHELL -l",
     user    => $user,
     group   => $user,
     unless  => "cat /home/${user}/.profile | grep rbenv",
   }->
   exec {"rbenv_root":
-    command => "echo 'export RBENV_ROOT=\"\$HOME/.rbenv\"' >> /home/${user}/.profile",
+    command => "echo 'export RBENV_ROOT=\"\$HOME/.rbenv\"' >> /home/${user}/.profile && exec \$SHELL -l",
     user    => $user,
     group   => $user,
     unless  => "cat /home/${user}/.profile | grep RBENV_ROOT",
   }->
   exec {"rbenv_init":
-    command     => "/home/${user}/.rbenv/bin/rbenv init - >> /home/${user}/.profile",
+    command     => "/home/${user}/.rbenv/bin/rbenv init - >> /home/${user}/.profile && exec \$SHELL -l",
     user        => $user,
     group       => $user,
     unless      => "cat /home/${user}/.profile | grep 'rbenv()'",
