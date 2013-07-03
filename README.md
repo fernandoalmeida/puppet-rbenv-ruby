@@ -1,7 +1,15 @@
-puppet-mongodb
+puppet-rbenv-ruby
 ==============
 
 A Puppet module for installing and configuring Ruby with Rbenv
+
+Usage
+--------------
+
+    class {"rbenv-ruby":
+      user    => "fernando",
+      version => "2.0.0-p247",
+    }
 
 License
 --------------
