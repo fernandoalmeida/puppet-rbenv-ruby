@@ -26,53 +26,54 @@ class rbenv-ruby($user, $version) {
     group   => $user,
   }->
   exec {"rbenv_path":
-    command => "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> /home/${user}/.profile && exec \$SHELL -l",
+    command => "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> /home/${user}/.profile",
     user    => $user,
     group   => $user,
     unless  => "cat /home/${user}/.profile | grep rbenv",
   }->
   exec {"rbenv_root":
-    command => "echo 'export RBENV_ROOT=\"\$HOME/.rbenv\"' >> /home/${user}/.profile && exec \$SHELL -l",
+    command => "echo 'export RBENV_ROOT=\"\$HOME/.rbenv\"' >> /home/${user}/.profile",
     user    => $user,
     group   => $user,
     unless  => "cat /home/${user}/.profile | grep RBENV_ROOT",
   }->
   exec {"rbenv_init":
-    command     => "/home/${user}/.rbenv/bin/rbenv init - >> /home/${user}/.profile && exec \$SHELL -l",
+    environment => "RBENV_ROOT=/home/${user}/.rbenv",
+    path        => "/home/${user}/.rbenv/bin:$path",
+    command     => "rbenv init - >> /home/${user}/.profile",
     user        => $user,
     group       => $user,
-    unless      => "cat /home/${user}/.profile | grep 'rbenv()'",
+    unless      => "cat /home/${user}/.profile | grep \'rbenv()\'",
   }->
   exec {"ruby-build":
     command => "git clone https://github.com/sstephenson/ruby-build.git /home/${user}/.rbenv/plugins/ruby-build",
     creates => "/home/${user}/.rbenv/plugins/ruby-build",
-    user        => $user,
-    group       => $user,
-    require     => [ Exec["rbenv_init"] ],
+    user    => $user,
+    group   => $user,
   }->
   exec {"rbenv-gemset":
     command => "git clone https://github.com/jamis/rbenv-gemset.git /home/${user}/.rbenv/plugins/rbenv-gemset",
     creates => "/home/${user}/.rbenv/plugins/rbenv-gemset",
-    user        => $user,
-    group       => $user,
+    user    => $user,
+    group   => $user,
   }->
   exec {"rbenv-vars":
     command => "git clone https://github.com/sstephenson/rbenv-vars.git /home/${user}/.rbenv/plugins/rbenv-vars",
     creates => "/home/${user}/.rbenv/plugins/rbenv-vars",
-    user        => $user,
-    group       => $user,
+    user    => $user,
+    group   => $user,
   }->
   exec {"rbenv-gem-rehash":
     command => "git clone https://github.com/sstephenson/rbenv-gem-rehash.git /home/${user}/.rbenv/plugins/rbenv-gem-rehash",
     creates => "/home/${user}/.rbenv/plugins/rbenv-gem-rehash",
-    user        => $user,
-    group       => $user,
+    user    => $user,
+    group   => $user,
   }->
   exec {"rbenv-default-gems":
     command => "git clone https://github.com/sstephenson/rbenv-default-gems.git /home/${user}/.rbenv/plugins/rbenv-default-gems",
     creates => "/home/${user}/.rbenv/plugins/rbenv-default-gems",
-    user        => $user,
-    group       => $user,
+    user    => $user,
+    group   => $user,
   }->
   file {'default-gems':
     ensure  => file,
@@ -85,14 +86,18 @@ class rbenv-ruby($user, $version) {
     ",
   }->
   exec {"ruby-install":
-    command => "/home/${user}/.rbenv/bin/rbenv install ${version}",
+    environment => "RBENV_ROOT=/home/${user}/.rbenv",
+    path        => "/home/${user}/.rbenv/bin:$path",
+    command => "rbenv install ${version}",
     user    => $user,
     group   => $user,
     creates => "/home/${user}/.rbenv/versions/${version}",
     timeout => 0,
   }->
   exec {"ruby-global":
-    command => "/home/${user}/.rbenv/bin/rbenv global ${version}",
+    environment => "RBENV_ROOT=/home/${user}/.rbenv",
+    path        => "/home/${user}/.rbenv/bin:$path",
+    command => "rbenv global ${version}",
     user    => $user,
     group   => $user,
     unless  => "/home/${user}/.rbenv/bin/rbenv versions | grep '* ${version}'",
