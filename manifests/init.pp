@@ -51,6 +51,12 @@ class rbenv-ruby($user, $version) {
     user    => $user,
     group   => $user,
   }->
+  exec {"rbenv-bundler":
+    command => "git clone https://github.com/carsomyr/rbenv-bundler.git /home/${user}/.rbenv/plugins/rbenv-bundler",
+    creates => "/home/${user}/.rbenv/plugins/rbenv-bundler",
+    user    => $user,
+    group   => $user,
+  }->
   exec {"rbenv-gemset":
     command => "git clone https://github.com/jamis/rbenv-gemset.git /home/${user}/.rbenv/plugins/rbenv-gemset",
     creates => "/home/${user}/.rbenv/plugins/rbenv-gemset",
