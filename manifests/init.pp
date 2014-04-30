@@ -19,6 +19,9 @@
 #
 class rbenv-ruby($user, $version) {
   
+  package {'git':
+    ensure => installed,
+  }->
   exec {"rbenv_download":
     command => "git clone git://github.com/sstephenson/rbenv.git /home/${user}/.rbenv",
     creates => "/home/${user}/.rbenv",
