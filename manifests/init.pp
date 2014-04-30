@@ -19,7 +19,22 @@
 #
 class rbenv-ruby($user, $version) {
   
-  package {'git':
+  $packages = [
+               "zlib1g",
+               "zlib1g-dev",
+               "libssl-dev",
+               "libreadline6",
+               "libreadline6-dev",
+               "libyaml-dev",
+               "libxml2-dev",
+               "libxslt-dev",
+               "build-essential",
+               "git-core",
+               "curl",
+               "openssl",
+               ]
+
+  package { $packages:
     ensure => installed,
   }->
   exec {"rbenv_download":
