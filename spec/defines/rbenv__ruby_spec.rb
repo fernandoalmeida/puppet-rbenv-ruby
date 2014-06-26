@@ -5,6 +5,10 @@ describe 'rbenv::ruby', type: :define do
   let(:user) { 'test' }
   let(:version) { '2.0.0-p247' }
 
+  it 'install dependencies' do
+    should contain_class('rbenv::dependencies')
+  end
+
   it 'install rbenv' do
     should contain_exec("rbenv_download_test_2.0.0-p247")
              .with_command("git clone git://github.com/sstephenson/rbenv.git /home/test/.rbenv")

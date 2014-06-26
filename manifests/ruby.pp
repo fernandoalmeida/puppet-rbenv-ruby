@@ -20,24 +20,8 @@ define rbenv::ruby(
     default => $config_file
   }
 
-  $packages = [
-    'zlib1g',
-    'zlib1g-dev',
-    'libssl-dev',
-    'libreadline6',
-    'libreadline6-dev',
-    'libyaml-dev',
-    'libxml2-dev',
-    'libxslt-dev',
-    'build-essential',
-    'git-core',
-    'curl',
-    'openssl'
-  ]
+  require rbenv::dependencies
 
-  package { $packages:
-    ensure => installed
-  }->
   exec {"rbenv_download_${user}_${version}":
     command => "git clone git://github.com/sstephenson/rbenv.git ${dir}/.rbenv",
     creates => "${dir}/.rbenv",
